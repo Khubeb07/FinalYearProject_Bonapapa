@@ -1,0 +1,222 @@
+{% extends 'mytemplates/admin_dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+
+<div class="main-content">
+  <h2>💵 Payment Report (Admin)</h2>
+
+  <!-- ✅ Topbar: Search + Filter + Export -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 25px;">
+    <!-- Search Bar -->
+    <div style="position: relative;">
+      <input type="text" id="searchPaymentInput" class="form-control" placeholder="Search Product or Customer..." style="max-width: 300px; padding-right: 35px;">
+      <i class="fas fa-search" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); color: gray;"></i>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <!-- Filter Button -->
+      <button id="filterIcon"
+              style="background: white; color: black; border: 2px solid #ddd; padding: 8px 16px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-weight: 600; box-shadow: 0px 2px 5px rgba(0,0,0,0.1); transition: 0.3s;"
+              onclick="toggleFilter()">
+        <img src="{% static 'images/adjust_17743998.png' %}" alt="Filter Icon" style="width: 18px; height: 18px;">
+        Filter
+      </button>
+
+      <!-- Export Button -->
+      <a href="{% url 'export_admin_payment_report' %}" class="btn btn-primary" style="padding: 8px 16px; font-weight: 600;">
+        📤 Export to Excel
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ Filter Sidebar -->
+  <div id="filterSidebar"
+       style="position: fixed; top: 80px; right: -320px; width: 260px; background: white; padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.1); transition: 0.5s ease; border-radius: 12px 0 0 12px; z-index: 9999;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h5 style="margin: 0;">Filter By</h5>
+      <button type="button" onclick="closeFilter()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+    </div>
+
+    <form id="paymentFilterForm">
+      <!-- Status Filter -->
+      <div class="mb-3">
+        <label>Status:</label>
+        <select id="statusFilter" class="form-select">
+          <option value="">-- All --</option>
+          <option value="pending">Pending</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <!-- Payment Method Filter -->
+      <div class="mb-3">
+        <label>Payment Method:</label>
+        <select id="paymentMethodFilter" class="form-select">
+          <option value="">-- All --</option>
+          <option value="eSewa">eSewa</option>
+          <option value="COD">Cash on Delivery</option>
+        </select>
+      </div>
+
+      <!-- Price Filters -->
+      <div class="mb-3">
+        <label>Min Price:</label>
+        <input type="number" id="minPriceFilter" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label>Max Price:</label>
+        <input type="number" id="maxPriceFilter" class="form-control">
+      </div>
+
+      <!-- Date Filters -->
+      <div class="mb-3">
+        <label>Start Date:</label>
+        <input type="date" id="startDateFilter" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label>End Date:</label>
+        <input type="date" id="endDateFilter" class="form-control">
+      </div>
+
+      <!-- Filter Actions -->
+      <button type="button" onclick="applyPaymentFilters()" class="btn btn-dark w-100 mt-2">Apply</button>
+      <button type="button" onclick="resetPaymentFilters()" class="btn btn-secondary w-100 mt-2">Reset</button>
+    </form>
+  </div>
+
+  <!-- ✅ Revenue Summary -->
+  <div class="revenue-summary" style="margin-bottom: 20px;">
+    <div><strong>eSewa Total:</strong> <span style="color: green;">Rs. {{ esewa_total }}</span></div>
+    <div><strong>Cash on Delivery:</strong> <span style="color: #ffc107;">Rs. {{ cod_total }}</span></div>
+    <div><strong>Overall Total:</strong> <span style="color: black;">Rs. {{ total_amount }}</span></div>
+  </div>
+
+  <!-- ✅ Payment Table -->
+  <div class="table-container">
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th>S.N.</th>
+          <th>Product</th>
+          <th>Customer</th>
+          <th>Amount (Rs)</th>
+          <th>Payment Method</th>
+          <th>Status</th>
+          <th>Order Date</th>
+        </tr>
+      </thead>
+      <tbody id="paymentTableBody">
+        {% for order in orders %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ order.product.product_name }}</td>
+          <td>{{ order.user.username }}</td>
+          <td>{{ order.total_price }}</td>
+
+          <!-- Payment Method Badges -->
+          <td>
+            {% if order.payment_method == 'eSewa' %}
+              <span class="badge" style="background-color: #4CAF50; color: white;">eSewa</span> <!-- Green -->
+            {% elif order.payment_method == 'COD' %}
+              <span class="badge" style="background-color: #FFC107; color: black;">Cash on Delivery</span> <!-- Yellow -->
+            {% else %}
+              <span class="badge bg-secondary">Unknown</span>
+            {% endif %}
+          </td>
+
+          <!-- Status Badges -->
+          <td>
+            {% if order.status == 'pending' %}
+              <span class="badge" style="background-color: #ffc107; color: black;">Pending</span> <!-- Yellow -->
+            {% elif order.status == 'shipped' %}
+              <span class="badge" style="background-color: #17a2b8; color: white;">Shipped</span> <!-- Light Blue -->
+            {% elif order.status == 'delivered' %}
+              <span class="badge" style="background-color: #28a745; color: white;">Delivered</span> <!-- Green -->
+            {% elif order.status == 'cancelled' %}
+              <span class="badge" style="background-color: #dc3545; color: white;">Cancelled</span> <!-- Red -->
+            {% else %}
+              <span class="badge bg-secondary">{{ order.status|title }}</span>
+            {% endif %}
+          </td>
+
+          <td>{{ order.order_date|date:"d M Y, h:i A" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No orders found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ✅ JavaScript -->
+<script>
+function toggleFilter() {
+  const sidebar = document.getElementById('filterSidebar');
+  sidebar.style.right = sidebar.style.right === '0px' ? '-320px' : '0px';
+}
+
+function closeFilter() {
+  document.getElementById('filterSidebar').style.right = '-320px';
+}
+
+function applyPaymentFilters() {
+  const status = document.getElementById('statusFilter').value.toLowerCase();
+  const paymentMethod = document.getElementById('paymentMethodFilter').value.toLowerCase();
+  const minPrice = parseFloat(document.getElementById('minPriceFilter').value) || 0;
+  const maxPrice = parseFloat(document.getElementById('maxPriceFilter').value) || Infinity;
+  const startDate = new Date(document.getElementById('startDateFilter').value);
+  const endDate = new Date(document.getElementById('endDateFilter').value);
+
+  const rows = document.querySelectorAll('#paymentTableBody tr');
+
+  rows.forEach(row => {
+    const rowStatus = row.cells[5].textContent.trim().toLowerCase();
+    const rowPaymentMethod = row.cells[4].textContent.trim().toLowerCase();
+    const rowPrice = parseFloat(row.cells[3].textContent.trim());
+    const rowDate = new Date(row.cells[6].textContent.trim());
+
+    let show = true;
+
+    if (status && rowStatus !== status) show = false;
+    if (paymentMethod && !rowPaymentMethod.includes(paymentMethod)) show = false;
+    if (rowPrice < minPrice || rowPrice > maxPrice) show = false;
+    if (startDate && rowDate < startDate) show = false;
+    if (endDate && rowDate > endDate) show = false;
+
+    row.style.display = show ? '' : 'none';
+  });
+
+  closeFilter();
+}
+
+function resetPaymentFilters() {
+  document.getElementById('paymentFilterForm').reset();
+  const rows = document.querySelectorAll('#paymentTableBody tr');
+  rows.forEach(row => row.style.display = '');
+  closeFilter();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchPaymentInput');
+  const tableRows = document.querySelectorAll('#paymentTableBody tr');
+
+  searchInput.addEventListener('keyup', function() {
+    const query = this.value.toLowerCase();
+    tableRows.forEach(row => {
+      const product = row.cells[1].textContent.toLowerCase();
+      const customer = row.cells[2].textContent.toLowerCase();
+      row.style.display = (product.includes(query) || customer.includes(query)) ? "" : "none";
+    });
+  });
+});
+</script>
+
+{% endblock %}
