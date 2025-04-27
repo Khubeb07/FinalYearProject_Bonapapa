@@ -1,0 +1,501 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ✅ Styles -->
+<link rel="stylesheet" href="{% static 'css/product.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<body>
+<!-- ✅ Filter Icon -->
+<!-- ✅ Filter Toggle Button (non-fixed) -->
+<div class="filter-toggle-wrapper">
+  <button id="filterIcon" class="filter-toggle-btn" onclick="toggleFilter()">
+    <img src="{% static 'images/adjust_17743998.png' %}" alt="Filter Icon" class="filter-icon-small">
+    <span class="filter-label">Filter</span>
+  </button>
+</div>
+
+<!-- ✅ Toast Container -->
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<!-- ✅ Filter Sidebar -->
+<div class="filter-sidebar" id="filterSidebar">
+  <button class="filter-close" onclick="closeFilter()">×</button>
+  <h5>Filter By</h5>
+  <form id="filterForm">
+    <div class="filter-section">
+      <label><span>Baby Diapers</span><input type="checkbox" name="category" value="Baby Diapers"></label>
+      <label><span>Adult Diapers</span><input type="checkbox" name="category" value="Adult Diapers"></label>
+      <label><span>Wipes</span><input type="checkbox" name="category" value="Wipes"></label>
+      <label><span>Sanitary Pads</span><input type="checkbox" name="category" value="Sanitary Pads"></label>
+    </div>
+
+
+    <div class="filter-section mt-3">
+      <label for="sort_by">Sort By:</label>
+      <select id="sort_by" class="form-select mt-1">
+        <option value="">-- Select --</option>
+        <option value="price_asc">Price: Low to High</option>
+        <option value="price_desc">Price: High to Low</option>
+        <option value="alpha_asc">Alphabetical (A-Z)</option>
+        <option value="alpha_desc">Alphabetical (Z-A)</option>
+      </select>
+    </div>
+
+    <div class="filter-section mt-3">
+      <label>Min Price:</label>
+      <input type="number" name="min_price" class="form-control mb-2">
+      <label>Max Price:</label>
+      <input type="number" name="max_price" class="form-control mb-2">
+    </div>
+
+    <button type="submit" class="btn btn-dark w-100 mt-2">Apply</button>
+  </form>
+</div>
+
+    <!-- ✅ All Products Title -->
+<div class="all-products-heading">
+  <h2>All Products</h2>
+  <div class="underline"></div>
+</div>
+
+<!-- ✅ Product Grid -->
+<div class="product-container" id="productContainer">
+  {% for product in products %}
+    <div class="product-item"
+         data-name="{{ product.product_name|lower }}"
+         data-price="{{ product.price }}"
+         data-category="{{ product.category|lower }}">
+
+      <div class="product-box">
+        <a href="{% url 'product_detail' product.id %}">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
+          {% else %}
+            <img src="{% static 'images/default-product.jpg' %}" alt="No Image Available">
+          {% endif %}
+        </a>
+
+
+        <div class="product-meta">
+          <p class="fw-semibold">
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+              {{ product.product_name }}
+            </a>
+          </p>
+          <p><strong>Rs. {{ product.price }}</strong></p>
+        </div>
+            <div class="product-actions" onclick="event.stopPropagation();">
+              <form method="POST" action="{% url 'add_to_wishlist' product.id %}" class="wishlist-form" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="border: none; background: none; padding: 0;" title="Add to Wishlist">
+                  <i class="fas fa-heart"></i>
+                </button>
+              </form>
+              <form method="POST" action="{% url 'add_to_cart' product.id %}" class="cart-form" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="border: none; background: none; padding: 0;" title="Add to Cart">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+              </form>
+            </div>
+      
+        <button class="buy-now-btn"
+                onclick="event.preventDefault(); openBuyNowModal('{{ product.id }}', '{{ product.product_name }}', '{{ product.price }}')">
+          Buy Now
+        </button>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<!-- ✅ Buy Now Modal -->
+<div class="modal fade" id="buyNowModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4 shadow rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">🛍️ Buy Now</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'buy_now_checkout' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" id="modalProductId">
+        <input type="hidden" id="modalBasePrice">
+        <div class="modal-body">
+          <p><strong id="modalProductName"></strong> - Rs. <span id="modalProductPrice"></span></p>
+
+          <label>Quantity:</label>
+          <input type="number" class="form-control mb-2" name="quantity" id="modalQuantity" min="1" value="1" required>
+
+          <label>Size:</label>
+          <select name="size" class="form-control mb-2" required>
+            <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+          </select>
+
+          <label>Full Name:</label>
+          <input type="text" class="form-control mb-2" name="name" required>
+
+          <label>Phone:</label>
+          <input type="tel" class="form-control mb-2" name="phone" required>
+
+          <label>Address:</label>
+          <textarea class="form-control mb-2" name="address" required></textarea>
+
+          <label>Payment Method:</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="payment_method" value="COD" checked>
+            <label class="form-check-label">Cash on delivery</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="payment_method" value="eSewa">
+            <label class="form-check-label">eSewa</label>
+          </div>
+
+          <p class="fw-bold text-success mt-3">Total: Rs. <span id="modalTotalAmount"></span></p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-success w-100 fw-bold" onclick="showConfirmation()">🛒 Place Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+    
+    
+<!-- ✅ Confirmation Modal -->
+<div class="modal fade" id="confirmOrderModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content p-4 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">Confirm Order</h5>
+      </div>
+      <div class="modal-body text-center pt-1">
+        <p>Are you sure you want to place this order?</p>
+        <div class="d-flex justify-content-center gap-3">
+          <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-success px-4" onclick="finalizeOrder()">Yes, Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ JavaScript -->
+<script>
+    let buyNowForm = null;
+    let basePrice = 0;
+    
+    function formatPrice(num) {
+      return parseFloat(num).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+    
+    function openBuyNowModal(productId, name, price) {
+      const modal = new bootstrap.Modal(document.getElementById('buyNowModal'));
+      document.getElementById('modalProductId').value = productId;
+      document.getElementById('modalProductName').textContent = name;
+      document.getElementById('modalBasePrice').value = price;
+      document.getElementById('modalQuantity').value = 1;
+      basePrice = parseFloat(price);
+      document.getElementById('modalProductPrice').textContent = formatPrice(basePrice);
+      document.getElementById('modalTotalAmount').textContent = formatPrice(basePrice);
+      modal.show();
+    }
+    
+    function showConfirmation() {
+      buyNowForm = document.querySelector("#buyNowModal form");
+      new bootstrap.Modal(document.getElementById('confirmOrderModal')).show();
+    }
+    
+    function finalizeOrder() {
+      bootstrap.Modal.getInstance(document.getElementById('confirmOrderModal')).hide();
+      bootstrap.Modal.getInstance(document.getElementById('buyNowModal')).hide();
+      setTimeout(() => {
+        buyNowForm.submit();
+      }, 500);
+    }
+    
+    function closeFilter() {
+      document.getElementById("filterSidebar").classList.remove("active");
+      document.getElementById("filterIcon").style.display = "block";
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    
+      const maxQuantity = 5;
+      const qty = document.getElementById('modalQuantity');
+      qty.addEventListener('input', () => {
+        let quantity = parseInt(qty.value) || 1;
+        if (quantity > maxQuantity) {
+          qty.value = maxQuantity;
+          showToast("You cannot order more than 5 items.", "error");
+        }
+        document.getElementById('modalTotalAmount').textContent = formatPrice(quantity * basePrice);
+      });
+    
+      document.getElementById("filterIcon").onclick = () => {
+        document.getElementById("filterSidebar").classList.add("active");
+        document.getElementById("filterIcon").style.display = "none";
+      };
+    
+    document.querySelectorAll('.wishlist-form').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'added') {
+            showToast('❤️ ' + data.message, 'success');
+          } else if (data.status === 'exists') {
+            showToast('⚠️ ' + data.message, 'error');
+          } else {
+            showToast('⚠️ Failed to add to wishlist.', 'error');
+          }
+        })
+        .catch(() => {
+          showToast('⚠️ Failed to add to wishlist.', 'error');
+        });
+      });
+    });
+
+    
+      document.querySelectorAll('.cart-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+          }).then(res => {
+            if (res.ok) showToast('🛒 Added to Cart');
+            else showToast('⚠️ Failed to Add', 'error');
+          });
+        });
+      });
+    
+      document.getElementById("filterForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        applyFilters();
+      });
+    
+      document.getElementById("sort_by").addEventListener("change", applyFilters);
+    
+      function applyFilters() {
+        const categories = Array.from(document.querySelectorAll("input[name='category']:checked"))
+                       .map(cb => cb.value.toLowerCase().trim());
+        const minPrice = parseFloat(document.querySelector("input[name='min_price']").value) || 0;
+        const maxPrice = parseFloat(document.querySelector("input[name='max_price']").value) || Infinity;
+        const sortBy = document.getElementById("sort_by").value;
+        const products = Array.from(document.querySelectorAll(".product-item"));
+    
+        products.forEach(p => {
+          const price = parseFloat(p.dataset.price);
+          const category = p.dataset.category.toLowerCase(); 
+          const show = (!categories.length || categories.includes(category)) && price >= minPrice && price <= maxPrice;
+          p.style.display = show ? "flex" : "none";
+        });
+    
+        if (sortBy) {
+          const container = document.getElementById("productContainer");
+          const visible = products.filter(p => p.style.display !== "none");
+          visible.sort((a, b) => {
+            if (sortBy === "price_asc") return a.dataset.price - b.dataset.price;
+            if (sortBy === "price_desc") return b.dataset.price - a.dataset.price;
+            if (sortBy === "alpha_asc") return a.dataset.name.localeCompare(b.dataset.name);
+            if (sortBy === "alpha_desc") return b.dataset.name.localeCompare(a.dataset.name);
+          });
+          visible.forEach(p => container.appendChild(p));
+        }
+      }
+    
+    });
+    
+    function showToast(message, type = 'success') {
+      // First, remove any existing toast
+      const oldToast = document.querySelector('#toast-container div');
+      if (oldToast) oldToast.remove();
+    
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.cssText = `
+        background: ${type === 'success' ? '#28a745' : '#dc3545'};
+        color: white; padding: 10px 20px; margin-bottom: 12px;
+        border-radius: 6px; font-weight: 600;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        animation: fadein 0.4s, fadeout 0.5s 1.5s;
+      `;
+      document.getElementById('toast-container').appendChild(toast);
+      setTimeout(() => toast.remove(), 2000); // 2 seconds
+    }
+
+    
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes fadein { from {opacity: 0; transform: translateY(-10px);} to {opacity: 1;} }
+      @keyframes fadeout { from {opacity: 1;} to {opacity: 0;} }
+    `;
+    document.head.appendChild(style);
+</script>
+
+
+
+{##}
+{#<!-- ✅ JavaScript -->#}
+{#<script>#}
+{#  let buyNowForm = null;#}
+{#  let basePrice = 0;#}
+{##}
+{#  function formatPrice(num) {#}
+{#    return parseFloat(num).toLocaleString("en-IN", {#}
+{#      minimumFractionDigits: 2,#}
+{#      maximumFractionDigits: 2#}
+{#    });#}
+{#  }#}
+{##}
+{#  function openBuyNowModal(productId, name, price) {#}
+{#    const modal = new bootstrap.Modal(document.getElementById('buyNowModal'));#}
+{#    document.getElementById('modalProductId').value = productId;#}
+{#    document.getElementById('modalProductName').textContent = name;#}
+{#    document.getElementById('modalBasePrice').value = price;#}
+{#    document.getElementById('modalQuantity').value = 1;#}
+{#    basePrice = parseFloat(price);#}
+{#    document.getElementById('modalProductPrice').textContent = formatPrice(basePrice);#}
+{#    document.getElementById('modalTotalAmount').textContent = formatPrice(basePrice);#}
+{#    modal.show();#}
+{#  }#}
+{##}
+{#  function showConfirmation() {#}
+{#    buyNowForm = document.querySelector("#buyNowModal form");#}
+{#    new bootstrap.Modal(document.getElementById('confirmOrderModal')).show();#}
+{#  }#}
+{##}
+{#  function finalizeOrder() {#}
+{#    bootstrap.Modal.getInstance(document.getElementById('confirmOrderModal')).hide();#}
+{#    bootstrap.Modal.getInstance(document.getElementById('buyNowModal')).hide();#}
+{#    setTimeout(() => {#}
+{#      buyNowForm.submit();#}
+{#    }, 500);#}
+{#  }#}
+{##}
+{#  function closeFilter() {#}
+{#    document.getElementById("filterSidebar").classList.remove("active");#}
+{#    document.getElementById("filterIcon").style.display = "block";#}
+{#  }#}
+{##}
+{#  document.addEventListener('DOMContentLoaded', () => {#}
+{#    document.getElementById("filterIcon").onclick = () => {#}
+{#      document.getElementById("filterSidebar").classList.add("active");#}
+{#      document.getElementById("filterIcon").style.display = "none";#}
+{#    };#}
+{##}
+{#    const quantityInput = document.getElementById('modalQuantity');#}
+{#    quantityInput.addEventListener('input', () => {#}
+{#      const qty = parseInt(quantityInput.value) || 1;#}
+{#      const total = basePrice * qty;#}
+{#      document.getElementById('modalTotalAmount').textContent = formatPrice(total);#}
+{#    });#}
+{##}
+{#    document.getElementById("filterForm").addEventListener("submit", function (e) {#}
+{#      e.preventDefault();#}
+{#      applyFilters();#}
+{#    });#}
+{##}
+{#    document.getElementById("sort_by").addEventListener("change", applyFilters);#}
+{##}
+{#    function applyFilters() {#}
+{#      const categories = Array.from(document.querySelectorAll("input[name='category']:checked"))#}
+{#                           .map(cb => cb.value.toLowerCase().trim());#}
+{#      const minPrice = parseFloat(document.querySelector("input[name='min_price']").value) || 0;#}
+{#      const maxPrice = parseFloat(document.querySelector("input[name='max_price']").value) || Infinity;#}
+{#      const sortBy = document.getElementById("sort_by").value;#}
+{#      const products = Array.from(document.querySelectorAll(".product-item"));#}
+{##}
+{#      products.forEach(p => {#}
+{#        const price = parseFloat(p.dataset.price);#}
+{#        const category = p.dataset.category.toLowerCase();#}
+{#        const show = (!categories.length || categories.includes(category)) && price >= minPrice && price <= maxPrice;#}
+{#        p.style.display = show ? "flex" : "none";#}
+{#      });#}
+{##}
+{#      if (sortBy) {#}
+{#        const container = document.getElementById("productContainer");#}
+{#        const visible = products.filter(p => p.style.display !== "none");#}
+{#        visible.sort((a, b) => {#}
+{#          if (sortBy === "price_asc") return a.dataset.price - b.dataset.price;#}
+{#          if (sortBy === "price_desc") return b.dataset.price - a.dataset.price;#}
+{#          if (sortBy === "alpha_asc") return a.dataset.name.localeCompare(b.dataset.name);#}
+{#          if (sortBy === "alpha_desc") return b.dataset.name.localeCompare(a.dataset.name);#}
+{#        });#}
+{#        visible.forEach(p => container.appendChild(p));#}
+{#      }#}
+{#    }#}
+{#  });#}
+{#  #}
+{#      function openProductDetail(name, price, desc, imageUrl, wishlistUrl, cartUrl) {#}
+{#      document.getElementById('detailName').textContent = name;#}
+{#      document.getElementById('detailPrice').textContent = "Rs. " + parseFloat(price).toFixed(2);#}
+{#      document.getElementById('detailDescription').textContent = desc;#}
+{#      document.getElementById('detailImage').src = imageUrl;#}
+{#      document.getElementById('detailWishlist').href = wishlistUrl;#}
+{#      document.getElementById('detailCart').href = cartUrl;#}
+{#    #}
+{#      new bootstrap.Modal(document.getElementById('productDetailModal')).show();#}
+{#}#}
+{#  #}
+{#</script>#}
+{#    #}
+{#    #}
+{#<script>#}
+{#  let detailProductId = '';#}
+{#  let detailProductName = '';#}
+{#  let detailProductPrice = '';#}
+{##}
+{#  function openProductDetail(name, price, description, imageUrl, wishlistUrl, cartUrl, productId) {#}
+{#    document.getElementById("detailName").textContent = name;#}
+{#    document.getElementById("detailPrice").textContent = `Rs. ${parseFloat(price).toLocaleString("en-IN")}`;#}
+{#    document.getElementById("detailDescription").textContent = description;#}
+{#    document.getElementById("detailImage").src = imageUrl;#}
+{#    document.getElementById("detailWishlist").href = wishlistUrl;#}
+{#    document.getElementById("detailCart").href = cartUrl;#}
+{##}
+{#    // Save for Buy Now use#}
+{#    detailProductId = productId;#}
+{#    detailProductName = name;#}
+{#    detailProductPrice = price;#}
+{##}
+{#    const detailModal = new bootstrap.Modal(document.getElementById('productDetailModal'));#}
+{#    detailModal.show();#}
+{#  }#}
+{##}
+{#  function triggerBuyNowFromDetail() {#}
+{#    const detailModalInstance = bootstrap.Modal.getInstance(document.getElementById('productDetailModal'));#}
+{#    if (detailModalInstance) detailModalInstance.hide();#}
+{##}
+{#    // Trigger main Buy Now modal#}
+{#    openBuyNowModal(detailProductId, detailProductName, detailProductPrice);#}
+{#  }#}
+{#</script>#}
+{#<script>#}
+{#  document.addEventListener('DOMContentLoaded', function() {#}
+{#    const toast = document.querySelector('.position-toast-center');#}
+{#    if (toast) {#}
+{#      setTimeout(() => {#}
+{#        toast.style.display = 'none';#}
+{#      }, 3000); // 3 seconds#}
+{#    }#}
+{#  });#}
+{#</script>#}
+
+</body>
+{% endblock %}

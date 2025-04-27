@@ -1,0 +1,48 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'css/aboutus.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <section class="about-container">
+        <h1 data-aos="fade-down">About Bonapapa</h1>
+        <div class="about-content">
+            <img src="{% static 'images/aboutus1.jpg' %}" alt="Bonapapa ">
+            <p><span class="highlight">Bonapapa</span> is a premium baby care brand introduced by Glow International, dedicated to ensuring the comfort, protection, and happiness of babies. We specialize in high-quality diapers and wipes that provide superior absorbency, softness, and breathability, keeping your little one dry and comfortable all day long. We understand that parenting comes with challenges, which is why Bonapapa is here to make diapering simple, stress-free, and reliable. Our products are carefully designed with baby-safe materials, offering a perfect balance of gentleness and durability. With Bonapapa, you can trust that your baby is receiving the best care possible from the very first day.</p>
+        </div>
+
+        <h1 data-aos="fade-down">Our Mission</h1>
+        <div class="about-content">
+            <img src="{% static 'images/aboutus2.jpg' %}"  alt="Happy Baby">
+            <p>At Bonapapa, our mission is to provide parents with safe, high-quality, and affordable baby essentials that support their little one's healthy development. We believe that every baby deserves products that prioritize comfort, hygiene, and skin protection without compromise. We are committed to continuous innovation in baby care, ensuring that our diapers and wipes meet the highest standards of safety and performance. By combining advanced technology with parent-approved designs, Bonapapa aims to create products that make daily life easier for families while keeping babies happy and healthy.</p>
+        </div>
+
+        <h1 data-aos="fade-down">Why Choose Bonapapa?</h1>
+        <div class="about-content">
+            <img src="{% static 'images/aboutus3.jpg' %}"  alt="Bonapapa Products">
+            <ul>
+                <li>Ultra-Soft & Breathable – Our diapers are made with gentle, skin-friendly materials that reduce irritation and keep your baby feeling fresh.</li>
+                <li>High Absorbency & Leak Protection – Designed for day and night use, our diapers provide superior absorption, preventing leaks and discomfort.</li>
+                <li> Gentle & Safe Baby Wipes – Made with dermatologically tested, hypoallergenic ingredients, our wipes are perfect for sensitive skin, keeping your baby clean and fresh with every use.</li>
+                <li>Affordable Without Compromise – We believe that quality baby care should be accessible to every parent, offering the best products at reasonable prices.</li>
+                <li>Trusted by Parents – Bonapapa is a brand created with love and care, ensuring that babies receive only the best from their first moments in life..</li>
+            </ul>
+        </div>
+        <h2 style="color:#A81C74; margin-bottom:10px;">Parent Company</h2>
+        <br>
+        <h1 data-aos="fade-down">About Glow International Pvt. Ltd.</h1>
+        
+
+            <div class="about-content">
+                <img src="{% static 'images/aboutus4.jpg' %}" alt="Glow International">
+                <p><span class="highlight">Glow International Pvt. Ltd.</span>, established in Nepal in 2018, began by importing globally recognized hygiene products from leading brands like <strong>Bonapapa</strong>, <strong>Safacare</strong>, and <strong>Momse</strong>—originally manufactured in Pakistan and distributed worldwide. Today, we proudly produce these quality products locally in Nepal, offering diapers, wipes, and sanitary pads designed to meet the needs of Nepali families. Our goal is to make trusted hygiene solutions more accessible while upholding international standards.</p>
+            </div>
+
+    </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({ duration: 1000, once: true });
+</script>
+{% endblock %}

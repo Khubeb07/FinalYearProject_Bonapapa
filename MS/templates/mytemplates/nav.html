@@ -1,0 +1,63 @@
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/nav.css' %}">
+
+
+    <header>
+        <div class="logo">
+            <img src="{% static 'images/logo.png' %}" style="width: 100px; height: 70px;">
+            
+        </div>
+        <nav>
+            <a href="{% url 'home' %}" class="active">Home</a>
+            <a href="{% url 'product' %}" >Product</a>
+            <a href="{% url 'aboutus' %}">About us</a>
+            <a href="{% url 'contactus' %}">Contact us</a>
+            <a href="{% url 'parenting' %}">Parenting Tips</a>
+            
+            {% if user.is_superuser or user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="admin-link">Dashboard</a>
+            {% endif %}
+            <form method="GET" action="{% url 'product' %}" class="search-form">
+              <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
+              <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </nav>
+            <div class="icons">
+                {% if user.is_authenticated %}
+                <div class="user-dropdown" onclick="toggleDropdown()">
+                  <span class="user-name">{{ user.get_full_name }}</span>
+                  <i class="fas fa-user-circle"></i>
+                  <div class="dropdown-menu" id="dropdown-menu">
+                    <span class="dropdown-item-text">Hello, {{ user.first_name }}</span>
+                    <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                    <a class="dropdown-item" href="{% url 'user_orders' %}">Orders</a>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                  </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-user-circle"></i></a>
+                {% endif %}
+        
+                <a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i></a>
+                <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i></a>
+            </div>
+    </header>
+
+
+<script>
+  function toggleDropdown() {
+    const menu = document.getElementById('dropdown-menu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  }
+
+  window.addEventListener('click', function (e) {
+    const dropdown = document.getElementById('dropdown-menu');
+    if (!e.target.closest('.user-dropdown') && dropdown) {
+      dropdown.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}
+
+

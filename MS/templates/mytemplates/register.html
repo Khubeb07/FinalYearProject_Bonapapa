@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonapapa - Register</title>
+  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="{% static 'images/logo.png' %}" alt="Bonapapa Logo">
+    </div>
+
+    <div class="form-wrapper">
+      <div class="form-container">
+        <h1>REGISTER</h1>
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <label for="{{ form.first_name.id_for_label }}">Full Name</label>
+          {{ form.first_name }}
+          {{ form.first_name.errors }}
+
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {{ form.username.errors }}
+
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {{ form.email.errors }}
+
+          <label for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+          {{ form.password.errors }}
+
+          <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+          {{ form.confirm_password }}
+          {{ form.confirm_password.errors }}
+
+          <button type="submit">Sign Up</button>
+        </form>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

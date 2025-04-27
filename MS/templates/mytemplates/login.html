@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonapapa - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %} ">
+</head>
+<body>
+{#{% if messages %}#}
+{#<div class="popup-wrapper">#}
+{#  {% for message in messages %}#}
+{#  <div class="popup {{ message.tags }}">{{ message }}</div>#}
+{#  {% endfor %}#}
+{#</div>#}
+{#<script>#}
+{#  setTimeout(() => {#}
+{#    document.querySelector('.popup-wrapper').style.display = 'none';#}
+{#  }, 4000);#}
+{#</script>#}
+{#{% endif %}#}
+    <div class="container">
+        <div class="logo-container">
+            <img src="{% static 'images/logo.png' %}" alt="Bonapapa Logo">
+        </div>
+        <div class="form-wrapper">
+            <div class="form-container">
+                <h1>LOGIN</h1>
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p style="color: red;">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <a href="{% url 'forgotpassword' %}" class="forgotpassword">Forgot Password?</a>
+                    <button type="submit">Login</button>
+                </form>
+                <p>Do not have an account? <a href="{% url 'register' %}">Register</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

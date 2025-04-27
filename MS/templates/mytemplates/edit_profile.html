@@ -1,0 +1,24 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <div class="profile-icon">
+      <i class="fas fa-user-edit"></i>
+    </div>
+    <h2 class="profile-title">Edit Profile</h2>
+
+    <form method="POST" class="edit-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <div class="form-actions">
+        <button type="submit" class="btn-edit">Save Changes</button>
+        <a href="{% url 'profile' %}" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

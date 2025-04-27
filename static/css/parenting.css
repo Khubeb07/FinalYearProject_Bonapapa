@@ -1,0 +1,140 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #fff;
+    color: black;
+    font-size: 20px;
+}
+
+/* Intro Section */
+.parenting-intro {
+    text-align: center;
+    padding: 60px 20px;
+    background: #A81C74;
+    color: #090909;
+}
+
+/* Parenting Tips (Full Width) */
+.parenting-tips {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 50px 20px;
+}
+
+.tip {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 1000px;
+}
+
+.tip img {
+    width: 50%;
+    border-radius: 10px;
+}
+
+.tip-text {
+    width: 50%;
+}
+
+.reverse {
+    flex-direction: row-reverse;
+}
+
+/* Size Guide */
+.size-guide {
+    max-width: 1000px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 40px;
+    background: #f1f1f1;
+}
+
+.size-chart table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.size-chart th, .size-chart td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.size-chart th {
+    background-color: #A81C74;
+    color: white;
+}
+
+/*  FAQ Section */
+.faq {
+    max-width: 800px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 40px;
+}
+
+.faq h2 {
+    font-size: 28px;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #A81C74;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+/*  FAQ Container */
+.faq-container {
+    margin-top: 20px;
+}
+
+/*  FAQ Items */
+.faq-item {
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: #f9f9f9;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*  FAQ Checkbox */
+.faq-item input {
+    display: none;
+}
+
+/*  FAQ Question */
+.faq-question {
+    width: 100%;
+    background: #A81C74;
+    color: white;
+    padding: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+}
+
+/*  FAQ Answer (Hidden by Default) */
+.faq-answer {
+    display: none;
+    padding: 15px;
+    background: white;
+    text-align: left;
+    font-size: 18px;
+}
+
+/*  Show FAQ Answer when Checked */
+.faq-item input:checked + .faq-question + .faq-answer {
+    display: block;
+}
+
+

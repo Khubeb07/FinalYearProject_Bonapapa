@@ -1,0 +1,338 @@
+/* ✅ General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #fff;
+    color: black;
+    font-size: 18px;
+}
+
+/* ✅ Full-Screen Centered Section (Header + Video) */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh; /* Full height to center everything */
+    width: 100%;
+    text-align: center;
+}
+
+/* ✅ Wrapper for Centered Content */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ Header Styling */
+h1 {
+    font-size: 2rem;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Video Section */
+video {
+    width: 80%;
+    max-width: 800px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+/* ✅ Top Selling Section */
+.top-selling {
+    text-align: center;
+    margin: 80px auto;
+    padding: 0 20px;
+}
+
+.top-selling h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #A81C74;
+    margin-bottom: 40px;
+    position: relative;
+    display: inline-block;
+}
+
+.top-selling h2::after {
+    content: "";
+    width: 60%;
+    height: 4px;
+    background-color: #A81C74;
+    position: absolute;
+    bottom: -10px;
+    left: 20%;
+    border-radius: 5px;
+}
+
+/* ✅ Product Grid */
+.product-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ✅ Product Card */
+
+.product-card {
+    background: #ffffff;
+    width: 280px;
+    height: 440px; /* slight increase */
+    padding: 0; /* no internal padding */
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    border-color: #A81C74;
+}
+
+.product-card img {
+    width: 100%;
+    height: 340px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.product-card p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    padding: 15px;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+}
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    .container h1 {
+        font-size: 2.5rem;
+    }
+
+    video {
+        width: 100%;
+        max-width: none;
+    }
+
+    .btn {
+        font-size: 1rem;
+        padding: 8px 20px;
+    }
+}
+.slideshow-container {
+    width: 100%;
+    max-width: 1400px;
+    height: 520px; /* 🔥 This is CRUCIAL */
+    margin: 40px auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #f5f5f5;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Base hidden state for all slides */
+.slide {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+/* Show the active slide */
+.slide.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Image styling inside slides */
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* or 'cover' if you want full bleed */
+    display: block;
+    background-color: #f5f5f5;
+}
+
+
+
+
+/* Buttons */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    padding: 14px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    user-select: none;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.prev { left: 20px; }
+.next { right: 20px; }
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+/* ✅ Dots Container */
+.dots-container {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.2); /* subtle white tint */
+    padding: 6px 12px;
+    border-radius: 12px;
+}
+
+/* ✅ Dots - Black Theme */
+.dot {
+    height: 12px;
+    width: 12px;
+    margin: 0 5px;
+    background-color: rgba(0, 0, 0, 0.5); /* default: semi-black */
+    border-radius: 50%;
+    display: inline-block;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+/* ✅ Active Dot */
+.active-dot {
+    background-color: black; /* solid black */
+    opacity: 1;
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.4); /* optional glow */
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+    .slideshow-container {
+        aspect-ratio: 1 / 1;
+    }
+}
+.new-products-section {
+  padding: 40px 30px;
+  background-color: #e8ffe8;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.new-products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+}
+
+.new-product-card {
+  width: 180px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 10px;
+  transition: transform 0.3s;
+}
+
+.new-product-card:hover {
+  transform: translateY(-5px);
+}
+
+.new-img-box img {
+  width: 100%;
+  height: 130px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.new-product-info {
+  margin-top: 10px;
+}
+
+.product-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin: 5px 0;
+}
+
+.product-price {
+  color: #11998e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-actions {
+  margin: 8px 0;
+}
+
+.card-actions a {
+  color: #333;
+  font-size: 16px;
+  margin: 0 5px;
+}
+
+.card-actions a:hover {
+  color: #11998e;
+}
+.btn-view {
+  display: inline-block;
+  background-color: #A81C74;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; /* Keeps it on one line */
+}
+
+
+

@@ -1,0 +1,29 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="/static/css/productpage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <main class="product-container">
+        <div class="product-image">
+            <img src="images/bonapapa-plus.jpg" alt="BONA PAPA PLUS ECO SMALL 1'S">
+        </div>
+        <div class="product-details">
+            <h1>BONA PAPA PLUS ECO SMALL 1'S</h1>
+            <h2>Rs. 850</h2>
+            <p>
+                Bona Papa Baby diapers gives your child the comfort and freedom required to keep them active and happy. 
+                Its anatomical shape and quality material absorbs all the wetness leaving the baby dry, energetic and lively all day long. 
+                Get a Bona Papa diaper now and let your baby have fun and enjoy.
+            </p>
+            <button class="buy-btn">Buy</button>
+            <div class="product-icons">
+                <i class="fas fa-heart"></i>
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+        </div>
+    </main>
+    
+{% endblock %}
+

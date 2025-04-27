@@ -1,0 +1,302 @@
+{#{% extends 'mytemplates/index.html' %}#}
+{#{% load static %}#}
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- ✅ Slider -->
+<div class="slideshow-container" id="slideshow">
+  <div class="slide fade">
+    <img src="{% static 'images/home1.jpeg' %}" alt="Slide 1">
+  </div>
+  <div class="slide fade">
+    <img src="{% static 'images/home2.jpeg' %}" alt="Slide 2">
+  </div>
+  <div class="slide fade">
+    <img src="{% static 'images/home31.jpeg' %}" alt="Slide 3">
+  </div>
+
+  <!-- Navigation -->
+  <a class="prev" onclick="plusSlides(-1)">❮</a>
+  <a class="next" onclick="plusSlides(1)">❯</a>
+
+  <!-- Dots -->
+  <div class="dots-container">
+    <span class="dot" onclick="currentSlide(1)"></span>
+    <span class="dot" onclick="currentSlide(2)"></span>
+    <span class="dot" onclick="currentSlide(3)"></span>
+  </div>
+</div>
+
+<!-- ✅ Top Selling Section -->
+<section class="top-selling">
+  <h2>Top Selling Items</h2>
+  <div class="product-container">
+    <div class="product-card">
+      <img src="{% static 'images/Bonappapa magic diapers 9-13kg.webp' %}" alt="Bona Papa Super XL">
+      <p>Bona Papa Magic</p>
+    </div>
+    <div class="product-card">
+      <img src="{% static 'images/wipes1.jpg' %}" alt="Bona Papa Magic">
+      <p>Bona Papa Magic</p>
+    </div>
+    <div class="product-card">
+      <img src="{% static 'images/bonapapa super xl.jpeg' %}" alt="Bona Papa Jumbo">
+      <p>Bona Papa Jumbo</p>
+    </div>
+  </div>
+</section>
+<section class="new-products-section">
+  <h2 class="section-title">🧼 New Products</h2>
+  <div class="new-products-grid">
+    {% for product in new_products %}
+    <div class="new-product-card">
+      <div class="new-img-box">
+        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-product.jpg' %}{% endif %}" alt="{{ product.product_name }}">
+      </div>
+      <div class="new-product-info">
+        <p class="product-name">{{ product.product_name }}</p>
+        <p class="product-price">Rs. {{ product.price }}</p>
+        <div class="card-actions">
+          <a href="{% url 'add_to_wishlist' product.id %}"><i class="fas fa-heart"></i></a>
+          <a href="{% url 'add_to_cart' product.id %}"><i class="fas fa-shopping-cart"></i></a>
+           <a href="{% url 'product' %}" class="btn-view">View Product</a>
+
+            
+
+        </div>
+        
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+
+<!-- ✅ Scripts -->
+<script>
+    let slideIndex = 0;
+    let slides = [];
+    let dots = [];
+    let autoSlideInterval;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        slides = document.querySelectorAll(".slide");
+        dots = document.querySelectorAll(".dot");
+
+        if (slides.length === 0) return;
+
+        showSlide(slideIndex); // show the first slide
+
+        autoSlideInterval = setInterval(() => {
+            plusSlides(1);
+        }, 4000); // auto-slide every 4s
+
+        const slideshow = document.getElementById("slideshow");
+        slideshow.addEventListener("mouseenter", stopAutoSlide);
+        slideshow.addEventListener("mouseleave", startAutoSlide);
+
+        window.plusSlides = plusSlides;
+        window.currentSlide = currentSlide;
+    });
+
+    function plusSlides(n) {
+        slideIndex += n;
+        showSlide(slideIndex);
+    }
+
+    function currentSlide(n) {
+        slideIndex = n - 1;
+        showSlide(slideIndex);
+    }
+
+    function showSlide(index) {
+        slideIndex = (index + slides.length) % slides.length;
+
+        slides.forEach((slide, i) => {
+            slide.classList.remove("show");
+        });
+
+        dots.forEach((dot, i) => {
+            dot.classList.remove("active-dot");
+        });
+
+        slides[slideIndex].classList.add("show");
+        if (dots[slideIndex]) {
+            dots[slideIndex].classList.add("active-dot");
+        }
+    }
+
+    function stopAutoSlide() {
+        clearInterval(autoSlideInterval);
+    }
+
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            plusSlides(1);
+        }, 4000);
+    }
+</script>
+</script>
+
+{% endblock %}
+
+{##}
+{#{% block content %}#}
+{#    #}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">#}
+{#    <div class="slideshow-container" id="slideshow">#}
+{#    <div class="slide fade">#}
+{#        <img src="{% static 'images/home1.jpeg' %}" alt="Slide 1" width="300px">#}
+{#    </div>#}
+{#    <div class="slide fade">#}
+{#        <img src="{% static 'images/home2.jpeg' %}" alt="Slide 2">#}
+{#    </div>#}
+{#    <div class="slide fade">#}
+{#        <img src="{% static 'images/home31.jpeg' %}" alt="Slide 3">#}
+{#    </div>#}
+{##}
+{#    <!-- Navigation -->#}
+{#    <a class="prev" onclick="plusSlides(-1)">❮</a>#}
+{#    <a class="next" onclick="plusSlides(1)">❯</a>#}
+{##}
+{#    <!-- Dots -->#}
+{#    <div class="dots-container">#}
+{#        <span class="dot" onclick="currentSlide(1)"></span>#}
+{#        <span class="dot" onclick="currentSlide(2)"></span>#}
+{#        <span class="dot" onclick="currentSlide(3)"></span>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#    <section class="top-selling">#}
+{#        <h2>Top Selling Items</h2>#}
+{#        <div class="product-container">#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Magic">#}
+{#                <p>Bona Papa Magic NB</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Wipes">#}
+{#                <p>Bona Papa Baby Wipes</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#        </div>#}
+{#        <br>#}
+{#        <br>#}
+{#        <div class="product-container">#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#            <div class="product-card">#}
+{#                <img src="{% static 'images/bonapapamagic.jpg' %}" alt="Bona Papa Super">#}
+{#                <p>Bona Papa Super XL</p>#}
+{#            </div>#}
+{#        </div>#}
+{#    #}
+{#    </section>#}
+{#  <section class="new-products-section">#}
+{#  <h2 class="section-title">🧼 New Products</h2>#}
+{#  <div class="new-products-grid">#}
+{#    {% for product in new_products %}#}
+{#    <div class="new-product-card">#}
+{#      <div class="new-img-box">#}
+{#        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-product.jpg' %}{% endif %}" alt="{{ product.product_name }}">#}
+{#      </div>#}
+{#      <div class="new-product-info">#}
+{#        <p class="product-name">{{ product.product_name }}</p>#}
+{#        <p class="product-price">Rs. {{ product.price }}</p>#}
+{#        <div class="card-actions">#}
+{#          <a href="{% url 'add_to_wishlist' product.id %}"><i class="fas fa-heart"></i></a>#}
+{#          <a href="{% url 'add_to_cart' product.id %}"><i class="fas fa-shopping-cart"></i></a>#}
+{#        </div>#}
+{#        <button class="btn-buy" onclick="openBuyNowModal('{{ product.id }}', '{{ product.product_name }}', '{{ product.price }}')">Buy Now</button>#}
+{#      </div>#}
+{#    </div>#}
+{#    {% endfor %}#}
+{#  </div>#}
+{#</section>#}
+{##}
+{#<script>#}
+{#    let slideIndex = 0;#}
+{#    let slides = [];#}
+{#    let dots = [];#}
+{#    let autoSlideInterval;#}
+{##}
+{#    document.addEventListener("DOMContentLoaded", function () {#}
+{#        slides = document.querySelectorAll(".slide");#}
+{#        dots = document.querySelectorAll(".dot");#}
+{##}
+{#        if (slides.length === 0) return;#}
+{##}
+{#        showSlide(slideIndex); // show the first slide#}
+{##}
+{#        autoSlideInterval = setInterval(() => {#}
+{#            plusSlides(1);#}
+{#        }, 4000); // auto-slide every 4s#}
+{##}
+{#        const slideshow = document.getElementById("slideshow");#}
+{#        slideshow.addEventListener("mouseenter", stopAutoSlide);#}
+{#        slideshow.addEventListener("mouseleave", startAutoSlide);#}
+{##}
+{#        window.plusSlides = plusSlides;#}
+{#        window.currentSlide = currentSlide;#}
+{#    });#}
+{##}
+{#    function plusSlides(n) {#}
+{#        slideIndex += n;#}
+{#        showSlide(slideIndex);#}
+{#    }#}
+{##}
+{#    function currentSlide(n) {#}
+{#        slideIndex = n - 1;#}
+{#        showSlide(slideIndex);#}
+{#    }#}
+{##}
+{#    function showSlide(index) {#}
+{#        slideIndex = (index + slides.length) % slides.length;#}
+{##}
+{#        slides.forEach((slide, i) => {#}
+{#            slide.classList.remove("show");#}
+{#        });#}
+{##}
+{#        dots.forEach((dot, i) => {#}
+{#            dot.classList.remove("active-dot");#}
+{#        });#}
+{##}
+{#        slides[slideIndex].classList.add("show");#}
+{#        if (dots[slideIndex]) {#}
+{#            dots[slideIndex].classList.add("active-dot");#}
+{#        }#}
+{#    }#}
+{##}
+{#    function stopAutoSlide() {#}
+{#        clearInterval(autoSlideInterval);#}
+{#    }#}
+{##}
+{#    function startAutoSlide() {#}
+{#        autoSlideInterval = setInterval(() => {#}
+{#            plusSlides(1);#}
+{#        }, 4000);#}
+{#    }#}
+{#</script>#}
+{##}
+{#{% endblock %}#}

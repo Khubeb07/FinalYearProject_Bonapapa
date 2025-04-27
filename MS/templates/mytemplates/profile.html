@@ -1,0 +1,29 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <div class="profile-icon">
+      <i class="fas fa-user-circle"></i>
+    </div>
+    <h2 class="profile-title">Profile Information</h2>
+
+    <div class="profile-info">
+      <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+      <p><strong>Username:</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Role:</strong>
+        {% if user.is_superuser %} Admin
+        {% elif user.is_staff %} Staff
+        {% else %} Customer
+        {% endif %}
+      </p>
+    </div>
+
+    <a href="{% url 'edit_profile' %}" class="btn-edit-profile">Edit Profile</a>
+  </div>
+</div>
+{% endblock %}

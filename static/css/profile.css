@@ -1,0 +1,142 @@
+/* ✅ Wrapper for both profile and edit page */
+.profile-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 100px);
+  background: #ffffff;
+  padding: 40px 20px;
+}
+
+/* ✅ Card container */
+.profile-card {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* ✅ User Icon */
+.profile-icon {
+  font-size: 60px;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+/* ✅ Section Title */
+.profile-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+/* ✅ Text Info in profile page */
+.profile-info p {
+  text-align: left;
+  font-size: 16px;
+  padding: 6px 0;
+  color: #444;
+}
+
+/* ✅ Edit Profile Button on view page */
+.btn-edit-profile {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 10px 25px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-edit-profile:hover {
+  background-color: #28a745;
+}
+
+/* ✅ Edit Form Styling */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+}
+
+/* ✅ Label Styling */
+.edit-form label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 15px;
+  color: #333;
+}
+
+/* ✅ Input Fields */
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  width: 100%;
+}
+
+/* ✅ Button Wrapper */
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 140px;
+}
+
+/* ✅ Save Button */
+.btn-edit {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-edit:hover {
+  background-color: #28a745;
+}
+
+/* ✅ Cancel Button */
+.btn-cancel {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #c82333;
+}
+
+/* ✅ Responsive Fix */
+@media (max-width: 600px) {
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-edit,
+  .btn-cancel {
+    width: 100%;
+    text-align: center;
+  }
+}

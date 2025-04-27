@@ -1,0 +1,231 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+
+<!-- ✅ Toast Notification Container -->
+<div class="toast-center" id="toastContainer"></div>
+
+<div class="product-detail-wrapper">
+  <!-- ✅ Main Product Section -->
+  <div class="product-detail-box">
+    <div class="left">
+      <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
+    </div>
+    <div class="right">
+      <h2>{{ product.product_name }}</h2>
+      <p class="price">Rs. {{ product.price }}</p>
+      <p class="desc">{{ product.description }}</p>
+      <div class="actions">
+        <button class="btn btn-dark" onclick="addToCart({{ product.id }})">Add to Cart</button>
+        <button class="btn btn-outline-dark" onclick="addToWishlist({{ product.id }})">Wishlist</button>
+        <button class="btn btn-success" onclick="openBuyNowPopup()">Buy Now</button>
+      </div>
+    </div>
+  </div>
+<br>
+  <!-- ✅ Related Products -->
+  <div class="related-products">
+    <h3>Related Products</h3>
+    <h3>Related Products</h3>
+    <div class="related-grid">
+      {% for related in related_products %}
+      <a href="{% url 'product_detail' related.id %}" class="related-card">
+        <img src="{{ related.image.url }}" alt="{{ related.product_name }}">
+        <p class="name">{{ related.product_name }}</p>
+        <p class="price">Rs. {{ related.price }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+      <!-- ✅ Ratings and Reviews -->
+      <div class="rating-review">
+        <h3>Ratings and Reviews</h3>
+    
+        {% for rating in product.rating_set.all %}
+        <div class="review-block">
+          <p class="stars">{% for i in "12345"|slice:":rating.rating" %}⭐{% endfor %}</p>
+          <p><strong>{{ rating.user }}</strong> - {{ rating.review }}</p>
+        </div>
+        {% empty %}
+        <p>No reviews yet.</p>
+        {% endfor %}
+
+    <!-- ✅ Add Review Form -->
+    <form method="POST" class="review-form">
+      {% csrf_token %}
+      <label>Your Rating:</label>
+      <div class="star-rating">
+        {% for i in "12345" %}
+        <i class="fas fa-star" data-value="{{ i }}"></i>
+        {% endfor %}
+        <input type="hidden" name="rating" id="starInput" required>
+      </div>
+
+      <label>Your Review:</label>
+      <textarea name="review" rows="3" required></textarea>
+
+      <button type="submit" class="btn btn-dark mt-2">Submit Review</button>
+    </form>
+  </div>
+</div>
+
+<!-- ✅ Buy Now Modal -->
+<div class="modal fade" id="buyNowModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4 shadow rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">🛍️ Buy Now</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{% url 'buy_now_checkout' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" id="modalBasePrice" value="{{ product.price }}">
+        <div class="modal-body">
+          <p><strong>{{ product.product_name }}</strong> - Rs. <span id="modalProductPrice">{{ product.price }}</span></p>
+
+          <label>Quantity:</label>
+          <input type="number" class="form-control mb-2" name="quantity" id="modalQuantity" min="1" value="1" required>
+
+          <label>Size:</label>
+          <select name="size" class="form-control mb-2" required>
+            <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+          </select>
+
+          <label>Full Name:</label>
+          <input type="text" class="form-control mb-2" name="name" required>
+
+          <label>Phone:</label>
+          <input type="tel" class="form-control mb-2" name="phone" required>
+
+          <label>Address:</label>
+          <textarea class="form-control mb-2" name="address" required></textarea>
+
+          <label>Payment Method:</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="payment_method" value="COD" checked>
+            <label class="form-check-label">Cash on delivery</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="payment_method" value="eSewa">
+            <label class="form-check-label">eSewa</label>
+          </div>
+
+          <p class="fw-bold text-success mt-3">Total: Rs. <span id="modalTotalAmount">{{ product.price }}</span></p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-success w-100 fw-bold" onclick="showConfirmation()">🛒 Place Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Confirm Order Modal -->
+<div class="modal fade" id="confirmOrderModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+    <div class="modal-content p-4 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">Confirm Order</h5>
+      </div>
+      <div class="modal-body text-center pt-1">
+        <p>Are you sure you want to place this order?</p>
+        <div class="d-flex justify-content-center gap-3">
+          <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-success px-4" onclick="finalizeOrder()">Yes, Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ JavaScript -->
+<script>
+  let buyNowForm = null;
+  let basePrice = parseFloat(document.getElementById('modalBasePrice').value);
+
+  function formatPrice(num) {
+    return parseFloat(num).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function openBuyNowPopup() {
+    const modal = new bootstrap.Modal(document.getElementById('buyNowModal'));
+    document.getElementById('modalQuantity').value = 1;
+    document.getElementById('modalTotalAmount').textContent = formatPrice(basePrice);
+    modal.show();
+  }
+
+  function showConfirmation() {
+    buyNowForm = document.querySelector("#buyNowModal form");
+    new bootstrap.Modal(document.getElementById('confirmOrderModal')).show();
+  }
+
+  function finalizeOrder() {
+    bootstrap.Modal.getInstance(document.getElementById('confirmOrderModal')).hide();
+    bootstrap.Modal.getInstance(document.getElementById('buyNowModal')).hide();
+    setTimeout(() => {
+      buyNowForm.submit();
+    }, 500);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Update total on quantity change
+    const qtyInput = document.getElementById('modalQuantity');
+    qtyInput.addEventListener('input', () => {
+      const qty = parseInt(qtyInput.value) || 1;
+      document.getElementById('modalTotalAmount').textContent = formatPrice(basePrice * qty);
+    });
+
+    // ⭐ Interactive Star Rating
+    const stars = document.querySelectorAll('.star-rating .fa-star');
+    const starInput = document.getElementById('starInput');
+    stars.forEach(star => {
+      star.addEventListener('mouseover', () => {
+        const val = star.getAttribute('data-value');
+        highlightStars(val);
+      });
+      star.addEventListener('click', () => {
+        const val = star.getAttribute('data-value');
+        starInput.value = val;
+        highlightStars(val);
+      });
+    });
+    document.querySelector('.star-rating').addEventListener('mouseleave', () => {
+      highlightStars(starInput.value);
+    });
+
+    function highlightStars(value) {
+      stars.forEach(star => {
+        star.classList.remove('selected');
+        if (parseInt(star.getAttribute('data-value')) <= value) {
+          star.classList.add('selected');
+        }
+      });
+    }
+  });
+
+  // ✅ AJAX Add to Cart / Wishlist
+  function showToast(msg) {
+    const box = document.createElement("div");
+    box.className = "toast-box";
+    box.innerText = msg;
+    document.getElementById("toastContainer").appendChild(box);
+    setTimeout(() => box.remove(), 3000);
+  }
+
+  function addToCart(id) {
+    fetch("{% url 'add_to_cart' 0 %}".replace(0, id))
+      .then(res => res.ok ? showToast("Added to cart!") : showToast("Error"));
+  }
+
+  function addToWishlist(id) {
+    fetch("{% url 'add_to_wishlist' 0 %}".replace(0, id))
+      .then(res => res.ok ? showToast("Added to wishlist!") : showToast("Error"));
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,234 @@
+.container {
+  width: 80%;
+  margin: auto;
+  padding: 30px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+}
+
+.cart-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.details {
+  flex: 1;
+}
+
+.details h3 {
+  margin: 0 0 10px;
+}
+
+.details p {
+  margin: 5px 0;
+}
+
+input[type="number"] {
+  width: 60px;
+  padding: 5px;
+  margin-left: 10px;
+}
+
+.actions .remove {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ✅ Updated Summary Section */
+.summary {
+  text-align: right;
+  margin-top: 30px;
+  background: #f8f9fa;
+  padding: 20px 30px;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.summary h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.summary h4 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.summary button {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.summary button:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+}
+
+.checkout {
+  background-color: #000;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ✅ Updated Coupon Section */
+.coupon-section {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  padding: 15px 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  margin-top: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.coupon-section label {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 0;
+}
+
+.coupon-section input[type="text"] {
+  width: 220px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.coupon-section input[type="text"]:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.4);
+  outline: none;
+}
+
+.coupon-section button {
+  padding: 10px 18px;
+  background-color: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.coupon-section button:hover {
+  background-color: #28a745;
+}
+
+/* ✅ Responsive for Mobile */
+@media (max-width: 768px) {
+  .coupon-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary {
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+/* ✅ Toast Container */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ✅ Common Toast Styling */
+.custom-toast {
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  animation: slidein 0.3s ease, fadeout 0.5s 2.5s ease forwards;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 250px;
+}
+
+/* ✅ Toast Color Themes */
+.custom-toast.success {
+  background: #28a745;
+}
+
+.custom-toast.error {
+  background: #dc3545;
+}
+
+/* ✅ Toast Close Button */
+.toast-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 12px;
+  line-height: 1;
+}
+
+/* ✅ Toast Animation */
+@keyframes slidein {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+}
+

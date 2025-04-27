@@ -1,0 +1,16 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+  <h3 class="text-center">Chat Support</h3>
+  <div class="chat-box p-4 border rounded bg-light" style="height: 400px; overflow-y: auto;">
+    {% for chat in chats %}
+      <p><strong>{{ chat.user }}:</strong> {{ chat.message }} <small class="text-muted">({{ chat.timestamp|date:"H:i:s" }})</small></p>
+    {% empty %}
+      <p>No messages yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

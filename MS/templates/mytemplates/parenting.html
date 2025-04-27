@@ -1,0 +1,112 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/parenting.css' %}">
+
+    <!-- ✅ Parenting Tips Intro Section -->
+    <section class="parenting-intro">
+        <h1>Parenting Tips & <span class="highlight">Product Guide</span></h1>
+        <p>Get helpful insights on newborn care, healthy hygiene routines, and choosing Bonapapa products designed for your baby’s comfort and safety.</p>
+    </section>
+
+    <!-- ✅ Parenting Tips Section -->
+    <section class="parenting-tips">
+        <div class="tip">
+            <img src="{% static 'images/parenting1.png' %}" alt="Newborn Baby Care">
+            <div class="tip-text">
+                <h2>Newborn Baby Care</h2>
+                <p>Taking care of a newborn requires gentleness, attention, and lots of love. Keep your baby’s skin clean and dry by using soft, breathable Bonapapa diapers, and change them frequently to avoid rashes. Use Bonapapa wipes, specially designed to be mild, hypoallergenic, and gentle on delicate skin. Always handle your baby with clean hands, and make sure their surroundings are warm, safe, and peaceful. Bonding through cuddles, soothing words, and eye contact helps build emotional connection in those precious early days.</p>
+            </div>
+        </div>
+
+        <div class="tip reverse">
+            <img src="{% static 'images/parenting2.jpg' %}" alt="Healthy Eating Habits">
+            <div class="tip-text">
+                <h2>Healthy Eating Habits</h2>
+                <p>Nutrition plays a key role in your baby’s growth and development. In the early months, ensure your baby is breastfed or formula-fed on a regular schedule to provide essential nutrients. As they grow, gradually introduce age-appropriate solid foods, starting with soft purees and progressing to easy-to-grasp finger foods. Avoid sugary or highly processed snacks. Establishing a consistent mealtime routine helps your baby explore flavors and textures while building a foundation for lifelong healthy eating habits.</p>
+            </div>
+        </div>
+
+        <div class="tip">
+            <img src="{% static 'images/parenting3.jpg' %}" alt="Better Sleep">
+            <div class="tip-text">
+                <h2>Better Sleep for Babies</h2>
+                <p>A well-rested baby is a happy baby. Set a calming bedtime routine with a warm bath, a fresh Bonapapa diaper, gentle lullabies, and dim lighting to help your little one wind down. Make sure the sleeping area is quiet, safe, and comfortable. Bonapapa diapers provide all-night dryness and leak protection, allowing your baby to sleep soundly without interruptions. Maintain consistent nap and bedtime schedules during the day to support a healthy sleep cycle.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ✅ Size & Product Guide -->
+    <section class="size-guide">
+        <h2>Size & Product Guide</h2>
+        <p>Wondering which diaper size is right for your baby? Check our Bona Papa Size Chart to find the perfect fit according to your baby's weight. Keep them comfy and happy all day long!</p>
+
+        <div class="size-chart">
+            <table>
+                <tr>
+                    <th>Baby's Weight</th>
+                    <th>Diaper Size</th>
+                    <th>Recommended Product</th>
+                </tr>
+                <tr>
+                    <td>Newborn - 4kg</td>
+                    <td>NB</td>
+                    <td>Bonapapa Newborn</td>
+                </tr>
+                <tr>
+                    <td>4kg - 8kg</td>
+                    <td>S</td>
+                    <td>Bonapapa Small</td>
+                </tr>
+                <tr>
+                    <td>8kg - 12kg</td>
+                    <td>M</td>
+                    <td>Bonapapa Medium</td>
+                </tr>
+                <tr>
+                    <td>12kg - 17kg</td>
+                    <td>L</td>
+                    <td>Bonapapa Large</td>
+                </tr>
+                <tr>
+                    <td>17kg and above</td>
+                    <td>XL</td>
+                    <td>Bonapapa XL</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <!-- ✅ FAQ Section (No JavaScript Required) -->
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-container">
+            <div class="faq-item">
+                <input type="checkbox" id="faq1">
+                <label for="faq1" class="faq-question">How often should I change my baby’s diaper?<span class="toggle-icon">+</span></label>
+                <div class="faq-answer">
+                    <p>We recommend changing every 2 to 3 hours or after a bowel movement. Bonapapa diapers offer excellent absorbency, but regular changes help keep your baby fresh, dry, and rash-free.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <input type="checkbox" id="faq2">
+                <label for="faq2" class="faq-question">Are Bonapapa diapers safe for sensitive skin? <span class="toggle-icon">+</span></label>
+                <div class="faq-answer">
+                    <p>Yes! Bonapapa diapers are made with breathable, hypoallergenic materials and infused with Chamomaline, a chamomile-based extract known for its soothing and skin-calming properties which is perfect for babies with sensitive skin.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <input type="checkbox" id="faq3">
+                <label for="faq3" class="faq-question">What makes Bonapapa wipes different? <span class="toggle-icon">+</span></label>
+                <div class="faq-answer">
+                    <p>Bonapapa wipes are dermatologically tested, alcohol-free, and infused with gentle cleansers to keep your baby’s skin soft, clean, and protected.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

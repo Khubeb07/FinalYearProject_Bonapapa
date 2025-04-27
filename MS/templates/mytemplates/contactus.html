@@ -1,0 +1,70 @@
+{% extends 'mytemplates/index.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- AOS Animation Library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/contact.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static '/css/contactus.css' %}">
+    
+    <section class="contact-container">
+        <h1>Contact <span class="highlight">Bonapapa</span></h1>
+        <p>We would love to hear from you! Reach out for any inquiries or support.</p>
+
+        <div class="contact-content">
+            <div class="contact-info">
+                <h2>Contact Information</h2>
+                <p><i class="fas fa-map-marker-alt"></i> Jhor,Tokha-1, Kathmandu, Nepal</p>
+                <p><i class="fas fa-envelope"></i> glowinternational2075@gmail.com</p>
+                <p><i class="fas fa-phone"></i> +977 9868730161</p>
+                <p><i class="fas fa-clock"></i> Sunday - Friday: 10:00 AM - 6:00 PM</p>
+            </div>
+
+            <div class="contact-form" data-aos="fade-left">
+            <h2>Send Us a Message</h2>
+            <form action="{% url 'contactus' %}" method="POST">
+                {% csrf_token %}
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="full_name" placeholder="Enter your full name" required>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+                <label for="contact">Contact</label>
+                <input type="text" id="contact" name="contact" placeholder="Enter your contact number" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+
+                <button type="submit"><i class="fas fa-paper-plane"></i> Send Message</button>
+            </form>
+            </div>
+        </div>
+        
+        <br>
+        <div class="map">
+            <h2>Our Location</h2>
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.408074741768!2d85.31232831493842!3d27.707132982792535!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1907b98d1a5f%3A0x1d2f2f9f6d0b52b5!2sKathmandu%2C%20Nepal!5e0!3m2!1sen!2snp!4v1634475478956!5m2!1sen!2snp"
+                width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
+        </div>
+    </section>
+    
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({ duration: 1000, once: true });
+
+  // Auto-close popup after 4 seconds
+  setTimeout(() => {
+      const popup = document.getElementById('popupMessage');
+      if (popup) {
+          popup.style.display = 'none';
+      }
+  }, 4000);
+</script>
+{% endblock %}
