@@ -1,14 +1,73 @@
 {% extends 'mytemplates/admin_dashboard.html' %}
+{% load static %}
 {% block content %}
+
 <h2>Manage Products</h2>
 
-<a href="{% url 'create_product' %}" class="btn-add">Add Product</a>
+<!-- ✅ Only Add Product Button on top -->
+<div style="margin-bottom: 15px;">
+  <a href="{% url 'create_product' %}" class="btn btn-primary" style="padding: 8px 16px; border-radius: 8px;">+ Add Product</a>
+</div>
 
+<!-- ✅ Search and Filter Row -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px;">
+  
+  <!-- Search Bar with Icon -->
+  <div style="position: relative; width: 300px;">
+    <input type="text" id="searchInput" placeholder="Search Product Name..."
+           style="padding: 8px 40px 8px 12px; width: 100%; border-radius: 8px; border: 1px solid #ccc;">
+    <i class="fas fa-search" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+  </div>
+
+  <!-- Filter Button -->
+  <button id="filterIcon"
+          class="btn"
+          style="background: white; color: black; border: 2px solid #ddd; padding: 8px 16px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-weight: 600; box-shadow: 0px 2px 5px rgba(0,0,0,0.1); transition: 0.3s;"
+          onclick="toggleFilter()">
+    <img src="{% static 'images/adjust_17743998.png' %}" alt="Filter Icon" style="width: 18px; height: 18px;">
+    Filter
+  </button>
+
+</div>
+
+<!-- ✅ Filter Sidebar Slide From Right -->
+<div id="filterSidebar"
+     style="position: fixed; top: 80px; right: -300px; width: 260px; background: white; padding: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.1); transition: 0.5s ease; border-radius: 12px 0 0 12px; z-index: 9999;">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h5 style="margin: 0;">Filter By</h5>
+    <button type="button" onclick="closeFilter()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+  </div>
+
+  <form id="productFilterForm">
+    <div style="margin-bottom: 10px;">
+      <label><input type="checkbox" class="category-checkbox" value="Baby Diapers"> Baby Diapers</label><br>
+      <label><input type="checkbox" class="category-checkbox" value="Adult Diapers"> Adult Diapers</label><br>
+      <label><input type="checkbox" class="category-checkbox" value="Sanitary Pads"> Sanitary Pads</label><br>
+      <label><input type="checkbox" class="category-checkbox" value="Wipes"> Wipes</label>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <label>Min Price:</label>
+      <input type="number" id="minPriceFilter" class="form-control mt-1">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <label>Max Price:</label>
+      <input type="number" id="maxPriceFilter" class="form-control mt-1">
+    </div>
+
+    <button type="button" onclick="applyProductFilters()" style="background: black; color: white; font-weight: bold; width: 100%; border-radius: 6px; padding: 8px; margin-top: 10px;">Apply</button>
+    <button type="button" onclick="resetProductFilters()" style="background: gray; color: white; font-weight: bold; width: 100%; border-radius: 6px; padding: 8px; margin-top: 8px;">Reset</button>
+  </form>
+</div>
+
+<!-- ✅ Product Table -->
 <div class="table-container">
   <table class="product-table">
     <thead>
       <tr>
-        <th>S.N.</th> <!-- Added Serial Number Column -->
+        <th>S.N.</th>
         <th>Image</th>
         <th>Name</th>
         <th>Price (Rs)</th>
@@ -21,12 +80,8 @@
     <tbody>
       {% for product in products %}
       <tr class="{% cycle 'row-light' 'row-dark' %}">
-        <td>{{ forloop.counter }}</td> <!-- Serial Number -->
-        <td>
-          {% if product.image %}
-            <img src="{{ product.image.url }}" width="60" />
-          {% endif %}
-        </td>
+        <td>{{ forloop.counter }}</td>
+        <td>{% if product.image %}<img src="{{ product.image.url }}" width="60">{% endif %}</td>
         <td>{{ product.product_name }}</td>
         <td>{{ product.price }}</td>
         <td>{{ product.quantity }}</td>
@@ -38,9 +93,64 @@
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="8">No products found.</td></tr>
+      <tr><td colspan="8" class="text-center">No products found.</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+
+<!-- ✅ JavaScript -->
+<script>
+function toggleFilter() {
+  const sidebar = document.getElementById('filterSidebar');
+  sidebar.style.right = sidebar.style.right === '0px' ? '-300px' : '0px';
+}
+
+function closeFilter() {
+  document.getElementById('filterSidebar').style.right = '-300px';
+}
+
+function applyProductFilters() {
+  const categories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value.toLowerCase());
+  const minPrice = parseFloat(document.getElementById('minPriceFilter').value) || 0;
+  const maxPrice = parseFloat(document.getElementById('maxPriceFilter').value) || Infinity;
+  const rows = document.querySelectorAll('.product-table tbody tr');
+
+  rows.forEach(row => {
+    const rowCategory = row.cells[6].textContent.trim().toLowerCase();
+    const rowPrice = parseFloat(row.cells[3].textContent.trim());
+    let show = true;
+    if (categories.length && !categories.includes(rowCategory)) show = false;
+    if (rowPrice < minPrice || rowPrice > maxPrice) show = false;
+    row.style.display = show ? "" : "none";
+  });
+
+  closeFilter();
+}
+
+function resetProductFilters() {
+  document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('minPriceFilter').value = "";
+  document.getElementById('maxPriceFilter').value = "";
+
+  const rows = document.querySelectorAll('.product-table tbody tr');
+  rows.forEach(row => { row.style.display = ""; });
+
+  closeFilter();
+}
+
+// ✅ Live Search
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('keyup', function () {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.product-table tbody tr');
+    rows.forEach(row => {
+      const productName = row.cells[2].textContent.trim().toLowerCase();
+      row.style.display = productName.includes(query) ? "" : "none";
+    });
+  });
+});
+</script>
+
 {% endblock %}

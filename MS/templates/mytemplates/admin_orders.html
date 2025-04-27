@@ -2,47 +2,70 @@
 {% load static %}
 {% block content %}
 
-{% if messages %}
-  <div id="toast-message" class="toast">
-    {% for message in messages %}
-      <p>{{ message }}</p>
-    {% endfor %}
+<h2>All Customer Orders</h2>
+    <br>
+
+<!-- ✅ Topbar: Search + Filter Button (Updated with Search Icon) -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  
+  <!-- Search Bar with Icon -->
+  <div style="position: relative; width: 300px;">
+    <input type="text" id="orderSearch"
+           placeholder="Search Product or Customer..."
+           style="padding: 8px 40px 8px 12px; width: 100%; border-radius: 8px; border: 1px solid #ccc;">
+    <i class="fas fa-search"
+       style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #888;"></i>
   </div>
 
-  <script>
-    window.onload = function () {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.style.display = 'block';
-        setTimeout(() => {
-          toast.style.opacity = '0';
-        }, 3000);
-        setTimeout(() => {
-          toast.remove();
-        }, 4000);
-      }
-    };
-  </script>
+  <!-- Filter Button -->
+  <button id="filterIcon" 
+          style="background: white; color: black; border: 2px solid #ddd; padding: 8px 16px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-weight: 600; box-shadow: 0px 2px 5px rgba(0,0,0,0.1); transition: 0.3s;"
+          onclick="toggleFilter()">
+    <img src="{% static 'images/adjust_17743998.png' %}" alt="Filter Icon" style="width: 18px; height: 18px;">
+    Filter
+  </button>
 
-  <style>
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #28a745;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      z-index: 9999;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: opacity 1s ease;
-    }
-  </style>
-{% endif %}
+</div>
 
-<h2>All Customer Orders</h2>
 
+<!-- ✅ Filter Sidebar -->
+<div id="filterSidebar" style="display: none; position: fixed; top: 100px; right: 30px; background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; width: 260px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 9999;">
+
+  <!-- Close Button -->
+  <button type="button" onclick="closeFilter()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+
+  <h5 style="margin-bottom: 15px;">Filter By</h5>
+
+  <form id="orderFilterForm">
+
+    <div class="mb-2">
+      <label>Status:</label>
+      <select id="statusFilter" class="form-control mt-1">
+        <option value="">-- All --</option>
+        <option value="pending">Pending</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div class="mb-2">
+      <label>Start Date:</label>
+      <input type="date" id="startDateFilter" class="form-control mt-1">
+    </div>
+
+    <div class="mb-2">
+      <label>End Date:</label>
+      <input type="date" id="endDateFilter" class="form-control mt-1">
+    </div>
+
+    <button type="button" onclick="applyOrderFilters()" class="btn btn-dark mt-3 w-100">Apply</button>
+    <button type="button" onclick="resetOrderFilters()" class="btn btn-secondary mt-2 w-100">Reset</button>
+
+  </form>
+</div>
+
+<!-- ✅ Orders Table -->
 <div class="table-container">
   {% if orders %}
     <table class="product-table">
@@ -57,9 +80,13 @@
           <th>Date</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="orderTableBody">
         {% for order in orders %}
-        <tr class="{% cycle 'row-light' 'row-dark' %}">
+        <tr class="{% cycle 'row-light' 'row-dark' %}" 
+            data-product="{{ order.product.product_name|lower }}" 
+            data-customer="{{ order.user|lower }}"
+            data-status="{{ order.status|lower }}"
+            data-date="{{ order.order_date|date:'Y-m-d' }}">
           <td>{{ forloop.counter }}</td>
           <td>{{ order.product.product_name }}</td>
           <td>{{ order.user }}</td>
@@ -87,5 +114,68 @@
     <div class="alert alert-info text-center">No orders found.</div>
   {% endif %}
 </div>
+
+<!-- ✅ JavaScript for Filter and Search -->
+<script>
+function toggleFilter() {
+  const sidebar = document.getElementById('filterSidebar');
+  sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeFilter() {
+  document.getElementById('filterSidebar').style.display = 'none';
+}
+
+function applyOrderFilters() {
+  const status = document.getElementById('statusFilter').value.toLowerCase();
+  const startDate = document.getElementById('startDateFilter').value;
+  const endDate = document.getElementById('endDateFilter').value;
+  const rows = document.querySelectorAll('#orderTableBody tr');
+
+  rows.forEach(row => {
+    const rowStatus = row.dataset.status;
+    const rowDate = new Date(row.dataset.date);
+
+    let show = true;
+
+    if (status && rowStatus !== status) {
+      show = false;
+    }
+
+    if (startDate && new Date(startDate) > rowDate) {
+      show = false;
+    }
+
+    if (endDate && new Date(endDate) < rowDate) {
+      show = false;
+    }
+
+    row.style.display = show ? "" : "none";
+  });
+
+  closeFilter();
+}
+
+function resetOrderFilters() {
+  document.getElementById('orderFilterForm').reset();
+  document.querySelectorAll('#orderTableBody tr').forEach(row => row.style.display = "");
+  closeFilter();
+}
+
+document.getElementById('orderSearch').addEventListener('input', function() {
+  const keyword = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#orderTableBody tr');
+
+  rows.forEach(row => {
+    const product = row.dataset.product;
+    const customer = row.dataset.customer;
+    if (product.includes(keyword) || customer.includes(keyword)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+});
+</script>
 
 {% endblock %}

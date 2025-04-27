@@ -264,6 +264,8 @@ def remove_cart_item(request, item_id):
 # ------------------------------------
 #        CUSTOMER - ORDERS
 # ------------------------------------
+
+@login_required
 def buy_now_checkout(request):
     if request.method == 'POST':
         try:
@@ -273,7 +275,7 @@ def buy_now_checkout(request):
             name = request.POST.get('name')
             phone = request.POST.get('phone')
             address = request.POST.get('address')
-            payment_method = request.POST.get('payment_method')
+            payment_method = request.POST.get('payment_method')  # ✅ captured
 
             # Limit quantity to 5
             if quantity > 5:
@@ -288,21 +290,22 @@ def buy_now_checkout(request):
 
             # Ensure there's enough stock
             if product.quantity >= quantity:
-                product.quantity -= quantity  # Decrease the quantity
-                product.save()  # Save the updated product quantity
+                product.quantity -= quantity
+                product.save()
             else:
                 messages.error(request, f"Not enough stock for {product.product_name}.")
                 return redirect('product')
 
             total_price = product.price * quantity
 
-            # Create the order
+            # ✅ Create the order and SAVE payment method also
             Order.objects.create(
-                user=request.user,              # ✅ FK to authenticated user
+                user=request.user,
                 product=product,
                 quantity=quantity,
                 total_price=total_price,
                 status='pending',
+                payment_method=payment_method,  # ✅ added here
             )
 
             messages.success(request, "Order placed successfully!")
@@ -317,7 +320,7 @@ def buy_now_checkout(request):
 
 @login_required
 def user_orders(request):
-    orders = Order.objects.filter(user=request.user.username).order_by('-order_date')
+    orders = Order.objects.filter(user=request.user).order_by('-order_date')
     return render(request, 'mytemplates/orders.html', {'orders': orders})
 
 
@@ -347,7 +350,7 @@ def checkout(request):
         name = request.POST.get("name")
         phone = request.POST.get("phone")
         address = request.POST.get("address")
-        payment_method = request.POST.get("payment_method")
+        payment_method = request.POST.get("payment_method")  # ✅ captured
 
         cart_items = CartItem.objects.filter(user=request.user)
         if not cart_items.exists():
@@ -355,45 +358,47 @@ def checkout(request):
             return redirect('cart')
 
         for item in cart_items:
-            # Fetch the quantity for each cart item dynamically from the form
             quantity = request.POST.get(f"quantity_{item.id}")
             if quantity is None or quantity == '':
-                quantity = 1  # Default to 1 if quantity is not provided or invalid
+                quantity = 1
             else:
                 try:
                     quantity = int(quantity)
                     if quantity < 1:
                         raise ValueError("Quantity must be at least 1.")
-                    if quantity > 5:  # Limit to a maximum of 5 units per product
+                    if quantity > 5:
                         messages.error(request, f"You cannot order more than 5 units of {item.product.product_name}.")
                         return redirect('cart')
                 except ValueError:
                     messages.error(request, f"Invalid quantity for {item.product.product_name}")
                     return redirect('cart')
 
-            # Create the order with the correct quantity
+            # ✅ Create the order and SAVE payment method also
             Order.objects.create(
                 user=request.user,
                 product=item.product,
                 quantity=quantity,
                 total_price=item.product.price * quantity,
-                status='pending'
+                status='pending',
+                payment_method=payment_method,  # ✅ added here
             )
 
             # Decrease the product's quantity after purchase
             product = item.product
             if product.quantity >= quantity:
                 product.quantity -= quantity
-                product.save()  # Save the updated product quantity
+                product.save()
             else:
                 messages.error(request, f"Not enough stock for {product.product_name}.")
                 return redirect('cart')
 
-        cart_items.delete()  # Clear the cart after placing the order
+        cart_items.delete()
         messages.success(request, "Your order has been placed successfully!")
         return redirect('user_orders')
 
     return redirect('cart')
+
+
 
 
 
@@ -727,3 +732,89 @@ def delete_coupon(request, coupon_id):
     coupon.delete()
     messages.success(request, 'Coupon deleted successfully!')
     return redirect('admin_coupons')
+
+
+
+from django.db.models import Sum
+from django.utils import timezone
+from django.http import HttpResponse
+import csv
+
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Order
+
+@login_required
+def admin_payment_report(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+
+    # ✅ Latest orders first (NEW)
+    orders = Order.objects.all().order_by('-order_date')
+
+    # Filtering
+    selected_method = request.GET.get('method')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if selected_method:
+        orders = orders.filter(payment_method=selected_method)
+    if start_date:
+        orders = orders.filter(order_date__date__gte=start_date)
+    if end_date:
+        orders = orders.filter(order_date__date__lte=end_date)
+
+    esewa_total = orders.filter(payment_method='eSewa').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    cod_total = orders.filter(payment_method='COD').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_amount = esewa_total + cod_total
+
+    return render(request, 'mytemplates/admin_payment_report.html', {
+        'orders': orders,
+        'esewa_total': esewa_total,
+        'cod_total': cod_total,
+        'total_amount': total_amount,
+        'selected_method': selected_method,
+        'start_date': start_date,
+        'end_date': end_date,
+    })
+
+
+@login_required
+def export_admin_payment_report(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+
+    orders = Order.objects.all()
+
+    # Apply same filtering here too
+    selected_method = request.GET.get('method')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if selected_method:
+        orders = orders.filter(payment_method=selected_method)
+    if start_date:
+        orders = orders.filter(order_date__date__gte=start_date)
+    if end_date:
+        orders = orders.filter(order_date__date__lte=end_date)
+
+    # Create CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="admin_payment_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Order ID', 'Product', 'Customer', 'Amount (Rs)', 'Payment Method', 'Status', 'Order Date'])
+
+    for order in orders:
+        writer.writerow([
+            order.id,
+            order.product.product_name,
+            order.user.username,
+            order.total_price,
+            order.payment_method,
+            order.status,
+            order.order_date.strftime('%Y-%m-%d'),
+        ])
+
+    return response
