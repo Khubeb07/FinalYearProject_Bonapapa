@@ -400,6 +400,11 @@ def checkout(request):
 
 
 
+from django.db.models import Count
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render
+from django.contrib.auth import get_user_model
+from .models import Product, Order
 
 
 # ------------------------------------
@@ -407,12 +412,21 @@ def checkout(request):
 # ------------------------------------
 @user_passes_test(is_admin)
 def admin_dashboard(request):
+    user_counts = {
+        'admin': User.objects.filter(is_superuser=True).count(),
+        'staff': User.objects.filter(is_staff=True, is_superuser=False).count(),
+        'customer': User.objects.filter(is_staff=False, is_superuser=False).count(),
+    }
+    order_status_counts = Order.objects.values('status').annotate(count=Count('status'))
+    category_counts = Product.objects.values('category').annotate(count=Count('category'))
+
     context = {
-        'total_users': User.objects.filter(is_superuser=False).count(),
+        'total_users': User.objects.count(),
         'total_products': Product.objects.count(),
-        'total_wishlist': WishlistItem.objects.count(),
-        'total_cart_items': CartItem.objects.count(),
         'total_orders': Order.objects.count(),
+        'user_counts': user_counts,
+        'order_status_counts': order_status_counts,
+        'category_counts': category_counts,
     }
     return render(request, 'mytemplates/admin_dashboard.html', context)
 
@@ -747,7 +761,7 @@ from .models import Order
 
 @login_required
 def admin_payment_report(request):
-    if not request.user.is_superuser:
+    if not (request.user.is_superuser or request.user.is_staff):
         return redirect('home')
 
     # ✅ Latest orders first (NEW)
@@ -782,7 +796,7 @@ def admin_payment_report(request):
 
 @login_required
 def export_admin_payment_report(request):
-    if not request.user.is_superuser:
+    if not (request.user.is_superuser or request.user.is_staff):
         return redirect('home')
 
     orders = Order.objects.all()
